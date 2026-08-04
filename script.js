@@ -31,7 +31,7 @@ random:true
 line_linked:{
 enable:true,
 distance:150,
-color:"#00ffff",
+color:"#00ffffd8",
 opacity:.3,
 width:1
 },
