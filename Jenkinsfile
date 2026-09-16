@@ -21,11 +21,11 @@ pipeline {
         stage('Validate Project') {
             steps {
                 echo 'Validating portfolio files...'
-                sh '''
-                    test -f index.html
-                    test -f style.css
-                    test -f script.js
-                    echo "Project structure looks valid."
+                bat '''
+                    if not exist index.html exit /b 1
+                    if not exist style.css exit /b 1
+                    if not exist script.js exit /b 1
+                    echo Project structure looks valid.
                 '''
             }
         }
@@ -33,12 +33,16 @@ pipeline {
         stage('Build Static Site') {
             steps {
                 echo 'Preparing static website artifacts...'
-                sh '''
-                    rm -rf dist
-                    mkdir -p dist
-                    cp -r index.html style.css script.js assets resume dist/
-                    echo "Build complete. Files copied to dist/"
-                    ls -R dist
+                bat '''
+                    if exist dist rmdir /s /q dist
+                    mkdir dist
+                    copy index.html dist\\
+                    copy style.css dist\\
+                    copy script.js dist\\
+                    if exist assets xcopy assets dist\\assets\\ /E /I
+                    if exist resume xcopy resume dist\\resume\\ /E /I
+                    echo Build complete. Files copied to dist\
+                    dir /s dist
                 '''
             }
         }
@@ -58,10 +62,10 @@ pipeline {
             }
             steps {
                 echo 'Deploying static website...'
-                sh '''
-                    echo "Deploying dist/ to ${DEPLOY_PATH}"
-                    # Replace with your real deployment command, for example:
-                    # rsync -av --delete dist/ user@server:/var/www/html/
+                bat '''
+                    echo Deploying dist\ to %DEPLOY_PATH%
+                    rem Replace with your real deployment command, for example:
+                    rem robocopy dist\\ server\\path\\ /E
                 '''
             }
         }
