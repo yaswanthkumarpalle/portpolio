@@ -1121,6 +1121,79 @@ transform:translateY(0);
     text-align:center;
 }
 
+#achievements {
+    text-align:center;
+}
+
+.achievements-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:30px;
+    margin-top:40px;
+}
+
+.achievement{
+    background:rgba(255,255,255,.10);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:20px;
+    padding:35px 25px;
+    text-align:center;
+    transition:.5s;
+    cursor:pointer;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 15px 25px rgba(0,0,0,.25);
+}
+
+.achievement::before{
+    content:"";
+    position:absolute;
+    top:-100%;
+    left:-100%;
+    width:250%;
+    height:250%;
+    background:linear-gradient(45deg,transparent,rgba(255,255,255,.25),transparent);
+    transform:rotate(45deg);
+    transition:.8s;
+}
+
+.achievement:hover::before{
+    top:100%;
+    left:100%;
+}
+
+.achievement:hover{
+    transform:translateY(-15px) scale(1.03);
+    background:rgba(255,255,255,.18);
+    box-shadow:0 15px 45px cyan;
+}
+
+.achievement i{
+    font-size:52px;
+    color:#00ffff;
+    margin-bottom:20px;
+    transition:.5s;
+}
+
+.achievement:hover i{
+    transform:rotate(360deg) scale(1.2);
+    color:white;
+    text-shadow:0 0 20px cyan;
+}
+
+.achievement h3{
+    font-size:24px;
+    margin-bottom:15px;
+    color:#00ffff;
+}
+
+.achievement p{
+    font-size:16px;
+    line-height:1.8;
+    color:#dbeafe;
+}
+
 .project{
 
     background:rgba(255,255,255,.10);
