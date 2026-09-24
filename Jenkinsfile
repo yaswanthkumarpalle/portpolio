@@ -1,85 +1,66 @@
 pipeline {
+
     agent any
 
-    options {
-        timestamps()
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
-
-    environment {
-        DEPLOY_PATH = 'https://your-deployment-target.example.com'
-    }
-
     stages {
+
         stage('Checkout') {
             steps {
-                echo 'Checking out source code...'
-                git branch: 'main', url: 'https://github.com/yaswanthkumarpalle/portpolio.git'
+                echo 'Downloading source code from GitHub...'
+                checkout scm
             }
         }
 
-        stage('Validate Project') {
+        stage('Test') {
             steps {
-                echo 'Validating portfolio files...'
+                echo 'Testing web application...'
+
                 bat '''
-                    if not exist index.html exit /b 1
-                    if not exist style.css exit /b 1
-                    if not exist script.js exit /b 1
-                    echo Project structure looks valid.
+                if exist index.html (
+                    echo TEST PASSED: index.html exists
+                ) else (
+                    echo TEST FAILED
+                    exit /b 1
+                )
                 '''
             }
         }
 
-        stage('Build Static Site') {
+        stage('Build') {
             steps {
-                echo 'Preparing static website artifacts...'
-                bat '''
-                    if exist dist rmdir /s /q dist
-                    mkdir dist
-                    copy index.html dist\\
-                    copy style.css dist\\
-                    copy script.js dist\\
-                    if exist assets xcopy assets dist\\assets\\ /E /I
-                    if exist resume xcopy resume dist\\resume\\ /E /I
-                    echo Build complete. Files copied to dist\
-                    dir /s dist
-                '''
-            }
-        }
+                echo 'Building web application...'
 
-        stage('Archive Artifacts') {
-            steps {
-                echo 'Archiving build output...'
-                archiveArtifacts artifacts: 'dist/**/*', fingerprint: true
+                bat '''
+                if not exist build mkdir build
+
+                copy index.html build\\
+                copy style.css build\\
+                '''
             }
         }
 
         stage('Deploy') {
-            when {
-                expression {
-                    return env.DEPLOY_PATH != 'https://your-deployment-target.example.com'
-                }
-            }
             steps {
-                echo 'Deploying static website...'
+                echo 'Deploying application...'
+
                 bat '''
-                    echo Deploying dist\ to %DEPLOY_PATH%
-                    rem Replace with your real deployment command, for example:
-                    rem robocopy dist\\ server\\path\\ /E
+                if not exist C:\\jenkins-deploy mkdir C:\\jenkins-deploy
+
+                copy /Y build\\index.html C:\\jenkins-deploy\\
+                copy /Y build\\style.css C:\\jenkins-deploy\\
                 '''
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline finished.'
-        }
+
         success {
-            echo 'Build and archive successful.'
+            echo 'CI/CD Pipeline completed successfully!'
         }
+
         failure {
-            echo 'Build failed. Please check the logs.'
+            echo 'CI/CD Pipeline failed!'
         }
     }
 }
